@@ -1,6 +1,7 @@
 package com.example.resturantproject
 
 import android.os.Bundle
+import android.os.Message
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -8,10 +9,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,7 +50,7 @@ class MainActivity : ComponentActivity() {
 fun RestaurantScreen() {
     // CHALLENGE 2 SESSION 3
     // ARRAY
-    val vipCustomers = arrayOf<String>("Reggie", "Quinn", "Elijah", "Rhian", "Rush")
+    val vipCustomers = arrayOf<String>("Reggie", "Quinn", "Elijah", "Rhian", "RJ", "Rush")
     // QUEUE
     val waitingList = remember { mutableStateListOf<String>() }
     // STACK
@@ -114,13 +117,22 @@ fun RestaurantScreen() {
         // CHALLENGE 6 SESSION 3
         Button(
             onClick = {
-                waitingList.addAll(vipCustomers)
-                message = "Vip customers added"
+            // waitingList.addAll(vipCustomers)
+               // message = "Vip customers added"
+
+                val currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("hh:mm:a"))
+
+                vipCustomers.forEach { vipCustomer ->
+                    waitingList.add(vipCustomer)
+                    customersTime[vipCustomer] = currentTime
+                }
+                message = "Vip customers added at $currentTime"
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Add VIP Customers")
+            Text("Load VIP Customers")
         }
+
         Spacer(modifier = Modifier.padding(8.dp))
         // CHALLENGE 7 SESSION 3
         Button(
@@ -138,10 +150,52 @@ fun RestaurantScreen() {
         ) {
             Text("Seat Next Customer")
         }
+        // CHALLENGE 1 SESSION 4
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("Message: $message")
+        Spacer(modifier = Modifier.padding(16.dp))
+        Card(modifier = Modifier.fillMaxWidth()) {
+            // CHALLENGE 2 SESSION 4
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("Waiting List(Queue)")
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // CHALLENGE 3 SESSION 4
+                if (waitingList.isEmpty()) {
+                    Text("No customers waiting")
+                } else {
+                   // waitingList.forEachIndexed { index, customer ->
+                     //   Text("${index + 1}. $customer")
+
+                    waitingList.forEachIndexed { index, customer ->
+                        val arrivalTime = customersTime[customer] ?: "Unknown"
+
+                        Text("${index + 1}. $customer (Arrival At: $arrivalTime)")
+                    }
+                }
+            }
+        }
+        // CHALLENGE 4 SESSION 4
+        Spacer(modifier = Modifier.height(16.dp))
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("Seated History(Stack)")
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // CHALLENGE 5 SESSION 4
+                if (seatedHistory.isEmpty()) {
+                    Text("No customers seated yet")
+                } else {
+                    seatedHistory.reversed().forEach { customer ->
+                        Text("- $customer")
+                    }
+                }
+            }
+        }
     }
 }
-
-
 
 @Preview(showBackground = true)
 @Composable
